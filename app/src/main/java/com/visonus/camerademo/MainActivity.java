@@ -1,4 +1,4 @@
-package com.deshpande.camerademo;
+package com.visonus.camerademo;
 
 import android.Manifest;
 import android.content.Intent;
@@ -18,6 +18,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 //import java.io.BufferedOutputStream;
+import com.deshpande.camerademo.R;
+
 import java.io.File;
 //import java.io.IOException;
 //import java.io.OutputStream;

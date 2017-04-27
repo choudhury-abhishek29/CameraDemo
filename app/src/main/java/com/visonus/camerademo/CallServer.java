@@ -1,4 +1,4 @@
-package com.deshpande.camerademo;
+package com.visonus.camerademo;
 
 import android.app.Activity;
 import android.os.AsyncTask;
