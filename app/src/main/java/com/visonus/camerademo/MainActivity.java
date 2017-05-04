@@ -3,6 +3,7 @@ package com.visonus.camerademo;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 //import android.os.AsyncTask;
 import android.os.Environment;
@@ -16,32 +17,22 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-//import java.io.BufferedOutputStream;
 import com.deshpande.camerademo.R;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-//import java.io.IOException;
-//import java.io.OutputStream;
-//import java.net.HttpURLConnection;
-//import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-//import okhttp3.MediaType;
-//import okhttp3.MultipartBody;
-//import okhttp3.OkHttpClient;
-//import okhttp3.Request;
-//import okhttp3.RequestBody;
-//import okhttp3.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements TaskCompleted {
 
     private Button takePictureButton;
     private ImageView imageView;
     private TextView textView;
-//    private TextView responseTextView;
+    private TextView responseTextView;
     private Uri file;
+    private Bitmap photo;
 
 
     @Override
@@ -73,11 +64,14 @@ public class MainActivity extends AppCompatActivity {
 
     public void takePicture(View view) {
         Log.d("HMKCODE", "[takePicture]");
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        Intent saveIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         file = Uri.fromFile(getOutputMediaFile());
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, file);
+        saveIntent.putExtra(MediaStore.EXTRA_OUTPUT, file);
+        startActivityForResult(saveIntent, 100);
 
-        startActivityForResult(intent, 100);
+
+//        Intent cameraIntent=new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+//        startActivityForResult(cameraIntent, 100);
     }
 
     public File getOutputMediaFile(){
@@ -97,33 +91,61 @@ public class MainActivity extends AppCompatActivity {
         return f;
     }
 
+    public void performCrop(Uri crop)
+    {
+        Intent cropIntent = new Intent("com.android.camera.action.CROP");
+        cropIntent.setDataAndType(crop, "image/*");
+        cropIntent.putExtra("return-data", true);
+        startActivityForResult(cropIntent, 200);
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d("HMKCODE", "[onActivityResult]");
-        if (requestCode == 100) {
-            if (resultCode == RESULT_OK) {
-                imageView.setImageURI(file);
-                Log.d("HMKCODE", "File Path : "+file.getPath());
-                textView.setText("PATH : "+file.getPath());
-                try
-                {
-                    Log.d("HMKCODE", "Calling [connectForMultipart]");
-                    connectForMultipart(file.getPath());
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
+        if (resultCode == RESULT_OK) {
+
+            switch(requestCode)
+            {
+                case 100:
+                    performCrop(file);
+                    Log.d("HMKCODE", "[MainActivity][onActivityResult]File Path : "+file.getPath());
+                    textView.setText("PATH : "+file.getPath());
+                    try
+                    {
+                        Log.d("HMKCODE", "Calling connectForMultipart");
+                        connectForMultipart(file.getPath());
+                        Log.d("HMKCODE", "[MainActivity][onActivityResult]post text read");
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                    break;
+
+                case 200:
+                    Bundle extras = data.getExtras();
+                    Bitmap thePic = extras.getParcelable("data");
+                    imageView.setImageBitmap(thePic);
+                    Uri temp = data.getData();
+//                    String temp = file.getPath();
+//                    File tempFile = data
             }
+
         }
     }
 
     public void connectForMultipart(String filePath) throws Exception
     {
-        Log.d("HMKCODE", "[connectForMultipart]");
+        Log.d("HMKCODE", "[MainActivity][connectForMultipart]");
 //        CallServer c = new CallServer(this);
-        CallServer c = new CallServer();
-        c.execute(filePath);
+//        CallServer c = new CallServer();
+//        c.execute(filePath);
+        new CallServer(MainActivity.this).execute(filePath);
+    }
 
+    @Override
+    public void onTaskComplete(String result) {
+        Log.d("HMKCODE", "[MainActivity][onTaskComplete]RESPONSE : "+result);
     }
 }

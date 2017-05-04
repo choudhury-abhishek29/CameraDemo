@@ -1,9 +1,12 @@
 package com.visonus.camerademo;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.TextView;
+
+import com.deshpande.camerademo.R;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,18 +27,22 @@ public class CallServer extends AsyncTask<String, String, String>
 {
     private static final MediaType MEDIA_TYPE_PNG = MediaType.parse("image/jpg");
     private static final String IMGUR_CLIENT_ID = "http://54.183.245.169:8080/upload";
-    private String response = "";
-    private WeakReference<Activity> mWeakActivity;
+    private String response;
+    private TaskCompleted mCallBack;
+    private Context mContext;
+//    private WeakReference<Activity> mWeakActivity;
 
-//    public CallServer(Activity act)
-//    {
-//        mWeakActivity = new WeakReference<Activity>(act);
-//    }
+    public CallServer(Context context)
+    {
+        this.mContext = context;
+        this.mCallBack = (TaskCompleted) context;
+    }
 
     @Override
     protected String doInBackground(String... strings)
     {
         String filePath = strings[0];
+        String text="";
         Log.d("HMKCODE", "[CallServer][doInBackground]filePath : "+filePath);
         OkHttpClient client = new OkHttpClient();
         RequestBody requestBody = new MultipartBody.Builder()
@@ -46,7 +53,6 @@ public class CallServer extends AsyncTask<String, String, String>
 
         Request request = new Request.Builder()
                                         .header("Authorization", "Client-ID " + IMGUR_CLIENT_ID)
-                                        //.url("https://api.imgur.com/3/image")
                                         .url(IMGUR_CLIENT_ID)
                                         .post(requestBody)
                                         .build();
@@ -56,26 +62,23 @@ public class CallServer extends AsyncTask<String, String, String>
             Response response = client.newCall(request).execute();
             if (!response.isSuccessful())
                 throw new IOException("Unexpected code " + response);
-            Log.d("HMKCODE", "[CallServer][doInBackground]RESPONSE : "+response.body().string());
-            this.response = response.body().string();
+
+            text = response.body().string();
+            Log.d("HMKCODE", "[CallServer][doInBackground]RESPONSE : "+text);
+            this.response = text;
+
+//            return response.body().string();
         }
         catch(Exception e)
         {
             e.printStackTrace();
         }
-        return this.response;
+        return text;
     }
 
-//    protected void onPostExecute(String response)
-//    {
-//        Activity main_activity = mWeakActivity.get();
-//
-//        if(main_activity != null)
-//        {
-//            Log.d("HMKCODE", "[CallServer][onPostExecute]RESPONSE : "+response);
-//            TextView responseTextView = (TextView) main_activity.findViewById(R.id.responseTextView);
-//            responseTextView.setText(response);
-//
-//        }
-//    }
+    protected void onPostExecute(String response)
+    {
+        Log.d("HMKCODE", "[CallServer][onPostExecute]RESPONSE : "+response);
+        mCallBack.onTaskComplete(this.response);
+    }
 }
