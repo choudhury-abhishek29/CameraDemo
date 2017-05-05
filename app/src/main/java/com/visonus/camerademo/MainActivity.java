@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements TaskCompleted {
     private TextView responseTextView;
     private Uri file;
     private Bitmap photo;
+    public static final String RESPONSE_TEXT = "com.visonus.camerademo.RESPONSE_TEXT";
 
 
     @Override
@@ -125,9 +126,7 @@ public class MainActivity extends AppCompatActivity implements TaskCompleted {
 
                 case 200:
                     Bundle extras = data.getExtras();
-                    Bitmap thePic = extras.getParcelable("data");
-                    imageView.setImageBitmap(thePic);
-                    Uri temp = data.getData();
+                    photo = extras.getParcelable("data");
 //                    String temp = file.getPath();
 //                    File tempFile = data
             }
@@ -147,5 +146,9 @@ public class MainActivity extends AppCompatActivity implements TaskCompleted {
     @Override
     public void onTaskComplete(String result) {
         Log.d("HMKCODE", "[MainActivity][onTaskComplete]RESPONSE : "+result);
+        imageView.setImageBitmap(photo);
+        Intent readIntent = new Intent(this, ReadActivity.class);
+        readIntent.putExtra(RESPONSE_TEXT, result);
+        startActivity(readIntent);
     }
 }
