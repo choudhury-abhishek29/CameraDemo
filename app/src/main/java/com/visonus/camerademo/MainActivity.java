@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
-//import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
@@ -19,7 +18,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.deshpande.camerademo.R;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -73,26 +71,6 @@ public class MainActivity extends AppCompatActivity implements TaskCompleted {
         saveIntent.putExtra(MediaStore.EXTRA_OUTPUT, file);
         startActivityForResult(saveIntent, 100);
 
-
-//        Intent cameraIntent=new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-//        startActivityForResult(cameraIntent, 100);
-    }
-
-    public File getOutputMediaFile(){
-        Log.d("HMKCODE", "[getOutputMediaFile]");
-        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "CameraDemo");
-
-        if (!mediaStorageDir.exists()){
-            if (!mediaStorageDir.mkdirs()){
-                Log.d("CameraDemo", "failed to create directory");
-                return null;
-            }
-        }
-
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        File f = new File(mediaStorageDir.getPath() + File.separator +"IMG_"+ timeStamp + ".jpg");
-        return f;
     }
 
     public void performCrop(Uri crop)
@@ -119,7 +97,8 @@ public class MainActivity extends AppCompatActivity implements TaskCompleted {
                     Bundle extras = data.getExtras();
                     photo = extras.getParcelable("data");
                     FileOutputStream fileOutputStream = null;
-                    try {
+                    try
+                    {
                         fileOutputStream = new FileOutputStream(path);
                         photo.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
                     } catch (Exception e) {
@@ -147,16 +126,29 @@ public class MainActivity extends AppCompatActivity implements TaskCompleted {
                         e.printStackTrace();
                     }
             }
-
         }
+    }
+
+    public File getOutputMediaFile(){
+        Log.d("HMKCODE", "[getOutputMediaFile]");
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), "CameraDemo");
+
+        if (!mediaStorageDir.exists()){
+            if (!mediaStorageDir.mkdirs()){
+                Log.d("CameraDemo", "failed to create directory");
+                return null;
+            }
+        }
+
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        File f = new File(mediaStorageDir.getPath() + File.separator +"IMG_"+ timeStamp + ".jpg");
+        return f;
     }
 
     public void connectForMultipart(String filePath) throws Exception
     {
         Log.d("HMKCODE", "[MainActivity][connectForMultipart]");
-        CallServer c = new CallServer(this);
-//        CallServer c = new CallServer();
-        c.execute(filePath);
         new CallServer(MainActivity.this).execute(filePath);
     }
 

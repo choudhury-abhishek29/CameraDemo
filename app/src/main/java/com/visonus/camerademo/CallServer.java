@@ -30,7 +30,6 @@ public class CallServer extends AsyncTask<String, String, String>
     private String response;
     private TaskCompleted mCallBack;
     private Context mContext;
-//    private WeakReference<Activity> mWeakActivity;
 
     public CallServer(Context context)
     {
