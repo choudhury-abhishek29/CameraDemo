@@ -21,6 +21,8 @@ import com.deshpande.camerademo.R;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -33,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements TaskCompleted {
     private TextView responseTextView;
     private Uri file;
     private Bitmap photo;
+    private String path;
     public static final String RESPONSE_TEXT = "com.visonus.camerademo.RESPONSE_TEXT";
 
 
@@ -108,27 +111,41 @@ public class MainActivity extends AppCompatActivity implements TaskCompleted {
             switch(requestCode)
             {
                 case 100:
+                    path = file.getPath();
                     performCrop(file);
-                    Log.d("HMKCODE", "[MainActivity][onActivityResult]File Path : "+file.getPath());
-                    textView.setText("PATH : "+file.getPath());
+                    break;
+
+                case 200:
+                    Bundle extras = data.getExtras();
+                    photo = extras.getParcelable("data");
+                    FileOutputStream fileOutputStream = null;
+                    try {
+                        fileOutputStream = new FileOutputStream(path);
+                        photo.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            if (fileOutputStream != null) {
+                                fileOutputStream.close();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    imageView.setImageBitmap(photo);
+                    textView.setText("PATH : "+path);
+
                     try
                     {
                         Log.d("HMKCODE", "Calling connectForMultipart");
-                        connectForMultipart(file.getPath());
+                        connectForMultipart(path);
                         Log.d("HMKCODE", "[MainActivity][onActivityResult]post text read");
                     }
                     catch (Exception e)
                     {
                         e.printStackTrace();
                     }
-
-                    break;
-
-                case 200:
-                    Bundle extras = data.getExtras();
-                    photo = extras.getParcelable("data");
-//                    String temp = file.getPath();
-//                    File tempFile = data
             }
 
         }
@@ -137,16 +154,15 @@ public class MainActivity extends AppCompatActivity implements TaskCompleted {
     public void connectForMultipart(String filePath) throws Exception
     {
         Log.d("HMKCODE", "[MainActivity][connectForMultipart]");
-//        CallServer c = new CallServer(this);
+        CallServer c = new CallServer(this);
 //        CallServer c = new CallServer();
-//        c.execute(filePath);
+        c.execute(filePath);
         new CallServer(MainActivity.this).execute(filePath);
     }
 
     @Override
     public void onTaskComplete(String result) {
         Log.d("HMKCODE", "[MainActivity][onTaskComplete]RESPONSE : "+result);
-        imageView.setImageBitmap(photo);
         Intent readIntent = new Intent(this, ReadActivity.class);
         readIntent.putExtra(RESPONSE_TEXT, result);
         startActivity(readIntent);
