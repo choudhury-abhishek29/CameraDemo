@@ -17,7 +17,7 @@ import java.util.Locale;
 
 public class ReadActivity extends AppCompatActivity implements TextToSpeech.OnInitListener, View.OnClickListener{
 
-    private TextView recievedText;
+    private EditText recievedText;
     private Button button_speak;
     private TextToSpeech tts;
     private String responseText;
@@ -27,7 +27,7 @@ public class ReadActivity extends AppCompatActivity implements TextToSpeech.OnIn
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_read);
 
-        this.recievedText = (TextView) findViewById(R.id.recievedText);
+        this.recievedText = (EditText) findViewById(R.id.recievedText);
         this.button_speak = (Button) findViewById(R.id.button_speak);
         button_speak.setOnClickListener(this);
         tts = new TextToSpeech(this, this);

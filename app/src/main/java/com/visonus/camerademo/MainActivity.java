@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements TaskCompleted {
         Intent cropIntent = new Intent("com.android.camera.action.CROP");
         cropIntent.setDataAndType(crop, "image/*");
         cropIntent.putExtra("return-data", true);
+//        cropIntent.putExtra(MediaStore.EXTRA_OUTPUT, crop);
         startActivityForResult(cropIntent, 200);
     }
 
@@ -96,22 +97,23 @@ public class MainActivity extends AppCompatActivity implements TaskCompleted {
                 case 200:
                     Bundle extras = data.getExtras();
                     photo = extras.getParcelable("data");
-                    FileOutputStream fileOutputStream = null;
-                    try
-                    {
-                        fileOutputStream = new FileOutputStream(path);
-                        photo.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    } finally {
-                        try {
-                            if (fileOutputStream != null) {
-                                fileOutputStream.close();
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
+                    Log.d("HMKCODE", "[onActivityResult]Intent DATA : "+data.toString());
+//                    FileOutputStream fileOutputStream = null;
+//                    try
+//                    {
+//                        fileOutputStream = new FileOutputStream(path);
+//                        photo.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    } finally {
+//                        try {
+//                            if (fileOutputStream != null) {
+//                                fileOutputStream.close();
+//                            }
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
                     imageView.setImageBitmap(photo);
                     textView.setText("PATH : "+path);
 
@@ -142,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements TaskCompleted {
         }
 
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        File f = new File(mediaStorageDir.getPath() + File.separator +"IMG_"+ timeStamp + ".jpg");
+        File f = new File(mediaStorageDir.getPath() + File.separator +"IMG_"+ timeStamp + ".jpeg");
         return f;
     }
 
