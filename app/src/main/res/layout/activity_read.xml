@@ -32,7 +32,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="18dp"
-        android:text="Convert"
         tools:layout_editor_absoluteX="148dp"
         tools:layout_editor_absoluteY="433dp"
         android:layout_alignParentBottom="true"

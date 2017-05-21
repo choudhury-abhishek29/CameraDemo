@@ -26,7 +26,7 @@ import okhttp3.Response;
 public class CallServer extends AsyncTask<String, String, String>
 {
     private static final MediaType MEDIA_TYPE_PNG = MediaType.parse("image/jpg");
-    private static final String IMGUR_CLIENT_ID = "http://54.183.245.169:8080/upload";
+    private static final String IMGUR_CLIENT_ID = "http://54.183.245.169:8080/code";
     private String response;
     private TaskCompleted mCallBack;
     private Context mContext;

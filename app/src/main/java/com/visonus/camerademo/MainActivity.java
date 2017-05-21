@@ -78,6 +78,10 @@ public class MainActivity extends AppCompatActivity implements TaskCompleted {
         Intent cropIntent = new Intent("com.android.camera.action.CROP");
         cropIntent.setDataAndType(crop, "image/*");
         cropIntent.putExtra("return-data", true);
+//        cropIntent.putExtra("outputX", 3264);
+//        cropIntent.putExtra("outputY", 1836);
+//        cropIntent.putExtra("aspectX", 1);
+//        cropIntent.putExtra("aspectY", 1);
 //        cropIntent.putExtra(MediaStore.EXTRA_OUTPUT, crop);
         startActivityForResult(cropIntent, 200);
     }
@@ -98,22 +102,22 @@ public class MainActivity extends AppCompatActivity implements TaskCompleted {
                     Bundle extras = data.getExtras();
                     photo = extras.getParcelable("data");
                     Log.d("HMKCODE", "[onActivityResult]Intent DATA : "+data.toString());
-//                    FileOutputStream fileOutputStream = null;
-//                    try
-//                    {
-//                        fileOutputStream = new FileOutputStream(path);
-//                        photo.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    } finally {
-//                        try {
-//                            if (fileOutputStream != null) {
-//                                fileOutputStream.close();
-//                            }
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
+                    FileOutputStream fileOutputStream = null;
+                    try
+                    {
+                        fileOutputStream = new FileOutputStream(path);
+                        photo.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            if (fileOutputStream != null) {
+                                fileOutputStream.close();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
                     imageView.setImageBitmap(photo);
                     textView.setText("PATH : "+path);
 
