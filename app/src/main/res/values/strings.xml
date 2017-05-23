@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">ViSonus</string>
+
+    <string name="image_prompt">Choose Image Type</string>
+    <string-array name="imageTypeArray">
+        <item>Image</item>
+        <item>Code</item>
+    </string-array>
 </resources>

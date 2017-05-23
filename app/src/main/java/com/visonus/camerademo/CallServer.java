@@ -26,7 +26,7 @@ import okhttp3.Response;
 public class CallServer extends AsyncTask<String, String, String>
 {
     private static final MediaType MEDIA_TYPE_PNG = MediaType.parse("image/jpg");
-    private static final String IMGUR_CLIENT_ID = "http://54.183.245.169:8080/code";
+//    private static final String IMGUR_CLIENT_ID = "http://54.183.245.169:8080/text";
     private String response;
     private TaskCompleted mCallBack;
     private Context mContext;
@@ -41,8 +41,11 @@ public class CallServer extends AsyncTask<String, String, String>
     protected String doInBackground(String... strings)
     {
         String filePath = strings[0];
+        String image_type = strings[1];
         String text="";
+        String call_url="";
         Log.d("HMKCODE", "[CallServer][doInBackground]filePath : "+filePath);
+        Log.d("HMKCODE", "[CallServer][doInBackground]image_type : "+image_type);
         OkHttpClient client = new OkHttpClient();
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
@@ -50,9 +53,17 @@ public class CallServer extends AsyncTask<String, String, String>
                         RequestBody.create(MEDIA_TYPE_PNG, new File(filePath)))
                 .build();
 
+        switch(image_type)
+        {
+            case "Code":    call_url = "http://54.183.245.169:8080/code";
+                break;
+            case "Image":   call_url = "http://54.183.245.169:8080/text";
+                break;
+        }
+
         Request request = new Request.Builder()
-                                        .header("Authorization", "Client-ID " + IMGUR_CLIENT_ID)
-                                        .url(IMGUR_CLIENT_ID)
+                                        .header("Authorization", "Client-ID " + call_url)
+                                        .url(call_url)
                                         .post(requestBody)
                                         .build();
         try
@@ -65,8 +76,6 @@ public class CallServer extends AsyncTask<String, String, String>
             text = response.body().string();
             Log.d("HMKCODE", "[CallServer][doInBackground]RESPONSE : "+text);
             this.response = text;
-
-//            return response.body().string();
         }
         catch(Exception e)
         {

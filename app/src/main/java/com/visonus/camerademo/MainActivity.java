@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -15,7 +16,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.Spinner;
+
 import com.deshpande.camerademo.R;
 
 import java.io.File;
@@ -25,16 +27,18 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
-public class MainActivity extends AppCompatActivity implements TaskCompleted {
+public class MainActivity extends AppCompatActivity implements TaskCompleted, View.OnClickListener
+{
 
-    private Button takePictureButton;
+    private Button camera_button, gallery_button;
     private ImageView imageView;
-    private TextView textView;
-    private TextView responseTextView;
+//    private TextView textView;
+    private Spinner spinner;
     private Uri file;
     private Bitmap photo;
     private String path;
     public static final String RESPONSE_TEXT = "com.visonus.camerademo.RESPONSE_TEXT";
+    private ImageView loading;
 
 
     @Override
@@ -43,13 +47,23 @@ public class MainActivity extends AppCompatActivity implements TaskCompleted {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        takePictureButton = (Button) findViewById(R.id.button_image);
+        camera_button = (Button) findViewById(R.id.button_camera);
+        gallery_button = (Button) findViewById(R.id.button_gallery);
         imageView = (ImageView) findViewById(R.id.imageview);
-        textView = (TextView) findViewById(R.id.textView);
+        spinner = (Spinner) findViewById(R.id.image_select);
+        loading = (ImageView) findViewById(R.id.loading);
+
+        gallery_button.setOnClickListener(this);
+//        textView = (TextView) findViewById(R.id.textView);
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            takePictureButton.setEnabled(false);
+            camera_button.setEnabled(false);
             ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE }, 0);
+        }
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            gallery_button.setEnabled(false);
+            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.READ_EXTERNAL_STORAGE }, 0);
         }
     }
 
@@ -59,7 +73,8 @@ public class MainActivity extends AppCompatActivity implements TaskCompleted {
         if (requestCode == 0) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
                     && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                takePictureButton.setEnabled(true);
+                camera_button.setEnabled(true);
+                gallery_button.setEnabled(true);
             }
         }
     }
@@ -78,11 +93,6 @@ public class MainActivity extends AppCompatActivity implements TaskCompleted {
         Intent cropIntent = new Intent("com.android.camera.action.CROP");
         cropIntent.setDataAndType(crop, "image/*");
         cropIntent.putExtra("return-data", true);
-//        cropIntent.putExtra("outputX", 3264);
-//        cropIntent.putExtra("outputY", 1836);
-//        cropIntent.putExtra("aspectX", 1);
-//        cropIntent.putExtra("aspectY", 1);
-//        cropIntent.putExtra(MediaStore.EXTRA_OUTPUT, crop);
         startActivityForResult(cropIntent, 200);
     }
 
@@ -95,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements TaskCompleted {
             {
                 case 100:
                     path = file.getPath();
+//                    path = RealPathUtil.getRealPathFromURI_API19(this, data.getData());
                     performCrop(file);
                     break;
 
@@ -105,7 +116,12 @@ public class MainActivity extends AppCompatActivity implements TaskCompleted {
                     FileOutputStream fileOutputStream = null;
                     try
                     {
-                        fileOutputStream = new FileOutputStream(path);
+                        path = RealPathUtil.getRealPathFromURI_API19(this, data.getData());
+                        File cropped_img = new File(path);
+                        if(cropped_img.exists()){
+                            photo = BitmapFactory.decodeFile(cropped_img.getAbsolutePath());
+                        }
+                        fileOutputStream = new FileOutputStream(cropped_img);
                         photo.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -119,7 +135,9 @@ public class MainActivity extends AppCompatActivity implements TaskCompleted {
                         }
                     }
                     imageView.setImageBitmap(photo);
-                    textView.setText("PATH : "+path);
+                    //loading image
+                    loading.setImageResource(R.mipmap.loading_bar);
+                    //textView.setText("PATH : "+path);
 
                     try
                     {
@@ -128,6 +146,20 @@ public class MainActivity extends AppCompatActivity implements TaskCompleted {
                         Log.d("HMKCODE", "[MainActivity][onActivityResult]post text read");
                     }
                     catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                    break;
+
+                case 300:
+                    try
+                    {
+                        path = RealPathUtil.getRealPathFromURI_API19(this, data.getData());
+                        imageView.setImageURI(data.getData());
+                        loading.setImageResource(R.mipmap.loading_bar);
+                        connectForMultipart(path);
+                    }
+                    catch(Exception e)
                     {
                         e.printStackTrace();
                     }
@@ -155,7 +187,9 @@ public class MainActivity extends AppCompatActivity implements TaskCompleted {
     public void connectForMultipart(String filePath) throws Exception
     {
         Log.d("HMKCODE", "[MainActivity][connectForMultipart]");
-        new CallServer(MainActivity.this).execute(filePath);
+        String spinner_text = spinner.getSelectedItem().toString();
+        Log.d("HMKCODE", "[MainActivity][connectForMultipart] Selectd Spinner Text : "+spinner_text);
+        new CallServer(MainActivity.this).execute(filePath, spinner_text);
     }
 
     @Override
@@ -164,5 +198,14 @@ public class MainActivity extends AppCompatActivity implements TaskCompleted {
         Intent readIntent = new Intent(this, ReadActivity.class);
         readIntent.putExtra(RESPONSE_TEXT, result);
         startActivity(readIntent);
+    }
+
+    @Override
+    public void onClick(View view)
+    {
+        Intent pick_intent = new Intent(Intent.ACTION_GET_CONTENT);
+        pick_intent.setType("image/*");
+        startActivityForResult(pick_intent, 300);
+
     }
 }
