@@ -18,7 +18,7 @@ import java.util.Locale;
 public class ReadActivity extends AppCompatActivity implements TextToSpeech.OnInitListener, View.OnClickListener{
 
     private EditText recievedText;
-    private Button button_speak;
+    private Button button_speak, button_stop;
     private TextToSpeech tts;
     private String responseText;
 
@@ -29,8 +29,9 @@ public class ReadActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
         this.recievedText = (EditText) findViewById(R.id.recievedText);
         this.button_speak = (Button) findViewById(R.id.button_speak);
-        button_speak.setText("READ");
+        this.button_stop = (Button) findViewById(R.id.button_stop);
         button_speak.setOnClickListener(this);
+        button_stop.setOnClickListener(this);
         tts = new TextToSpeech(this, this);
 
         Intent intent = getIntent();
@@ -53,35 +54,22 @@ public class ReadActivity extends AppCompatActivity implements TextToSpeech.OnIn
     @Override
     public void onClick(View v)
     {
-//        switch (v.getId()){
-//            case R.id.button_speak:
-                Log.d("HMKCODE", "[ReadActivity][onClick]RESPONSE : "+this.button_speak.getText());
+        switch (v.getId()){
+            case R.id.button_speak:
                 if(responseText.isEmpty())
-                {
                     Toast.makeText(ReadActivity.this, "Text is empty", Toast.LENGTH_SHORT).show();
-                }
                 else
-                {
-                    button_speak = (Button) findViewById(R.id.button_speak);
-                    Log.d("HMKCODE", "[ReadActivity][onClick]Button Text : "+this.button_speak.getText());
-                    switch (button_speak.getText().toString())
-                    {
-                        case "READ":
-                            button_speak.setText("STOP");
-                            tts.speak(responseText, TextToSpeech.QUEUE_FLUSH, null );
-                            button_speak.setText("READ");
-                            break;
+                    tts.speak(responseText, TextToSpeech.QUEUE_FLUSH, null );
+                break;
+            case R.id.button_stop:
+                tts.stop();
+                break;
+        }
+    }
 
-                        case "STOP":
-                            tts.stop();
-                            button_speak.setText("READ");
-                            break;
-                    }
-
-
-                }
-//                break;
-//        }
-
+    @Override
+    public void onStop(){
+        super.onStop();
+        tts.stop();
     }
 }
