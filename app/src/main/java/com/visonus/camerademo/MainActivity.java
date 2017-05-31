@@ -110,18 +110,14 @@ public class MainActivity extends AppCompatActivity implements TaskCompleted, Vi
                     break;
 
                 case 200:
-//                    Bundle extras = data.getExtras();
-//                    photo = extras.getParcelable("data");
-//                    Log.d("HMKCODE", "[onActivityResult]Intent DATA : "+data.toString());
+
+                    Bundle extras = data.getExtras();
+                    photo = extras.getParcelable("data");
+                    Log.d("HMKCODE", "[onActivityResult]Intent DATA : "+data.toString());
 //                    FileOutputStream fileOutputStream = null;
 //                    try
 //                    {
-//                        path = RealPathUtil.getRealPathFromURI_API19(this, data.getData());
-//                        File cropped_img = new File(path);
-//                        if(cropped_img.exists()){
-//                            photo = BitmapFactory.decodeFile(cropped_img.getAbsolutePath());
-//                        }
-//                        fileOutputStream = new FileOutputStream(cropped_img);
+//                        fileOutputStream = new FileOutputStream(RealPathUtil.getRealPathFromURI_API19(this, data.getData()));
 //                        photo.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
 //                    } catch (Exception e) {
 //                        e.printStackTrace();
@@ -134,26 +130,6 @@ public class MainActivity extends AppCompatActivity implements TaskCompleted, Vi
 //                            e.printStackTrace();
 //                        }
 //                    }
-
-                    Bundle extras = data.getExtras();
-                    photo = extras.getParcelable("data");
-                    Log.d("HMKCODE", "[onActivityResult]Intent DATA : "+data.toString());
-                    FileOutputStream fileOutputStream = null;
-                    try
-                    {
-                        fileOutputStream = new FileOutputStream(RealPathUtil.getRealPathFromURI_API19(this, data.getData()));
-                        photo.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    } finally {
-                        try {
-                            if (fileOutputStream != null) {
-                                fileOutputStream.close();
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
 
                     imageView.setImageBitmap(photo);
                     //loading image
