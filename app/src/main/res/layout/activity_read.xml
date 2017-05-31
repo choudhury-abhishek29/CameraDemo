@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/RelativeLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
@@ -39,23 +40,6 @@
         android:textColor="@android:color/holo_orange_dark"
         android:textSize="24sp" />
 
-    <EditText
-        android:id="@+id/recievedText"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignStart="@+id/textView2"
-        android:layout_below="@+id/textView2"
-        android:layout_marginBottom="70dp"
-        android:layout_marginTop="10dp"
-        android:background="@android:color/background_light"
-        android:ems="10"
-        android:focusable="false"
-        android:freezesText="true"
-        android:inputType="textMultiLine"
-        android:text="TextView"
-        android:textAlignment="inherit"
-        android:textSize="18sp" />
-
     <Button
         android:id="@+id/button_speak"
         android:text="Read"
@@ -75,5 +59,20 @@
         android:layout_marginStart="11dp"
         android:layout_toEndOf="@+id/button_speak"
         android:text="Stop" />
+
+    <TextView
+        android:id="@+id/recievedText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/button_speak"
+        android:layout_alignParentEnd="true"
+        android:layout_alignStart="@+id/textView2"
+        android:layout_below="@+id/textView2"
+        android:maxLines="1000"
+        android:paddingTop="20dp"
+        android:scrollbars="vertical"
+        android:text="TextView"
+        android:textColorLink="@android:color/holo_blue_light"
+        android:textSize="20sp" />
 
 </RelativeLayout>

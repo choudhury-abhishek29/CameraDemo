@@ -32,12 +32,12 @@ public class MainActivity extends AppCompatActivity implements TaskCompleted, Vi
 
     private Button camera_button, gallery_button;
     private ImageView imageView;
-//    private TextView textView;
     private Spinner spinner;
     private Uri file;
     private Bitmap photo;
-    private String path;
+    private String path, spinner_text;
     public static final String RESPONSE_TEXT = "com.visonus.camerademo.RESPONSE_TEXT";
+    public static final String IMAGE_TYPE = "com.visonus.camerademo.IMAGE_TYPE";
     private ImageView loading;
 
 
@@ -184,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements TaskCompleted, Vi
     public void connectForMultipart(String filePath) throws Exception
     {
         Log.d("HMKCODE", "[MainActivity][connectForMultipart]");
-        String spinner_text = spinner.getSelectedItem().toString();
+        spinner_text = spinner.getSelectedItem().toString();
         Log.d("HMKCODE", "[MainActivity][connectForMultipart] Selectd Spinner Text : "+spinner_text);
         new CallServer(MainActivity.this).execute(filePath, spinner_text);
     }
@@ -194,6 +194,7 @@ public class MainActivity extends AppCompatActivity implements TaskCompleted, Vi
         Log.d("HMKCODE", "[MainActivity][onTaskComplete]RESPONSE : "+result);
         Intent readIntent = new Intent(this, ReadActivity.class);
         readIntent.putExtra(RESPONSE_TEXT, result);
+        readIntent.putExtra(IMAGE_TYPE, spinner_text);
         startActivity(readIntent);
     }
 
