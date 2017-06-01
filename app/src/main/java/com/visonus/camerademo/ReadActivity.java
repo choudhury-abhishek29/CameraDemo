@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.deshpande.camerademo.R;
 
 import java.util.Locale;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ReadActivity extends AppCompatActivity implements TextToSpeech.OnInitListener, View.OnClickListener{
@@ -24,7 +25,7 @@ public class ReadActivity extends AppCompatActivity implements TextToSpeech.OnIn
     private TextView recievedText;
     private Button button_speak, button_stop;
     private TextToSpeech tts;
-    private String responseText, imageType;
+    private String responseText="", imageType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,17 +44,29 @@ public class ReadActivity extends AppCompatActivity implements TextToSpeech.OnIn
         responseText = intent.getStringExtra(MainActivity.RESPONSE_TEXT);
         imageType = intent.getStringExtra(MainActivity.IMAGE_TYPE);
 
-        if(imageType.equalsIgnoreCase("Code"))
+        if(imageType.equalsIgnoreCase("Code") && responseText!=null)
         {
-            String pattern = "^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
-            if(responseText.matches(pattern))
+            String pattern_url = "^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
+            if(responseText.matches(pattern_url))
             {
                 recievedText .setText(responseText);
                 Linkify.addLinks(recievedText , Linkify.WEB_URLS);
             }
             else
             {
-                recievedText.setText(responseText);
+                String pattern_num = "[0-9]+";
+                if(responseText.matches(pattern_num))
+                {
+                    Linkify.TransformFilter myTransformFilter = new Linkify.TransformFilter() {
+                        @Override
+                        public String transformUrl(Matcher match, String url) {
+                            return url.substring(0);
+                        }
+                    };
+                    Pattern pat_num = Pattern.compile(pattern_num);
+                    recievedText.setText(responseText);
+                    Linkify.addLinks(recievedText, pat_num, "http://www.google.com/search?q=", null, myTransformFilter);
+                }
             }
         }
         else
