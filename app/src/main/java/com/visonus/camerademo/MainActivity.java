@@ -114,6 +114,22 @@ public class MainActivity extends AppCompatActivity implements TaskCompleted, Vi
                     Bundle extras = data.getExtras();
                     photo = extras.getParcelable("data");
                     Log.d("HMKCODE", "[onActivityResult]Intent DATA : "+data.toString());
+                    FileOutputStream fileOutputStream = null;
+                    try
+                    {
+                        fileOutputStream = new FileOutputStream(file.getPath());
+                        photo.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            if (fileOutputStream != null) {
+                                fileOutputStream.close();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
                     imageView.setImageBitmap(photo);
                     //loading image
                     loading.setImageResource(R.mipmap.loading_bar);
