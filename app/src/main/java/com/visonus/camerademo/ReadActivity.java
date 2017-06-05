@@ -54,7 +54,7 @@ public class ReadActivity extends AppCompatActivity implements TextToSpeech.OnIn
             }
             else
             {
-                String pattern_num = "[0-9]+";
+                String pattern_num = "[0-9a-zA-Z]+";
                 if(responseText.matches(pattern_num))
                 {
                     Linkify.TransformFilter myTransformFilter = new Linkify.TransformFilter() {
